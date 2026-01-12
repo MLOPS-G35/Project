@@ -1,10 +1,8 @@
-name: Build Docker images (all branches)
+name: Build & push api/train Docker images to GHCR
 
 on:
   push:
-    branches:
-      - "**"
-  pull_request:
+    branches: [main]
 
 permissions:
   contents: read
@@ -17,19 +15,15 @@ jobs:
   build-api:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v3
+      - uses: docker/setup-buildx-action@v3
 
-      # GHCR richiede nomi immagini lowercase
       - name: Compute image base (lowercase)
         id: img
         run: echo "base=$(echo '${{ github.repository }}' | tr '[:upper:]' '[:lower:]')" >> $GITHUB_OUTPUT
 
       - name: Log in to GHCR
-        if: github.event_name == 'push'
         uses: docker/login-action@v3
         with:
           registry: ${{ env.REGISTRY }}
@@ -42,16 +36,15 @@ jobs:
         with:
           images: ${{ env.REGISTRY }}/${{ steps.img.outputs.base }}-api
           tags: |
-            type=ref,event=branch
             type=sha
-            type=raw,value=latest,enable={{is_default_branch}}
+            type=raw,value=latest
 
-      - name: Build and (maybe) push api image
+      - name: Build and push api image
         uses: docker/build-push-action@v6
         with:
           context: .
           file: dockerfiles/api.dockerfile
-          push: ${{ github.event_name == 'push' }}
+          push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
           cache-from: type=gha
@@ -60,18 +53,15 @@ jobs:
   build-train:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v3
+      - uses: docker/setup-buildx-action@v3
 
       - name: Compute image base (lowercase)
         id: img
         run: echo "base=$(echo '${{ github.repository }}' | tr '[:upper:]' '[:lower:]')" >> $GITHUB_OUTPUT
 
       - name: Log in to GHCR
-        if: github.event_name == 'push'
         uses: docker/login-action@v3
         with:
           registry: ${{ env.REGISTRY }}
@@ -84,17 +74,14 @@ jobs:
         with:
           images: ${{ env.REGISTRY }}/${{ steps.img.outputs.base }}-train
           tags: |
-            type=ref,event=branch
             type=sha
-            type=raw,value=latest,enable={{is_default_branch}}
+            type=raw,value=latest
 
-      - name: Build and (maybe) push train image
+      - name: Build and push train image
         uses: docker/build-push-action@v6
         with:
           context: .
           file: dockerfiles/train.dockerfile
-          push: ${{ github.event_name == 'push' }}
+          push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
