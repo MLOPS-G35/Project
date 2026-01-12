@@ -8,6 +8,6 @@ RUN uv sync --frozen --no-install-project
 
 COPY src ./src
 
-RUN uv sync --frozen
+RUN uv sync
 
 ENTRYPOINT ["uv", "run", "python", "src/mlops_group35/train.py"]
