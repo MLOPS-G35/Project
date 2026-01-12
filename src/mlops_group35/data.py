@@ -1,4 +1,5 @@
 from pathlib import Path
+import pandas as pd
 
 import typer
 from torch.utils.data import Dataset
@@ -9,6 +10,7 @@ class MyDataset(Dataset):
 
     def __init__(self, data_path: Path) -> None:
         self.data_path = data_path
+        self.data = pd.read_csv(data_path)
 
     def __len__(self) -> int:
         """Return the length of the dataset."""
@@ -23,7 +25,9 @@ def preprocess(data_path: Path, output_folder: Path) -> None:
     print("Preprocessing data...")
     dataset = MyDataset(data_path)
     dataset.preprocess(output_folder)
+    print(dataset)
 
 
 if __name__ == "__main__":
+    print("Preprocessing data main...")
     typer.run(preprocess)
