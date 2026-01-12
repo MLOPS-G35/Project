@@ -1,16 +1,3 @@
-import argparse
-
-import json
-import os
-from dataclasses import asdict, dataclass
-from pathlib import Path
-
-import torch
-from torch import nn
-from torch.utils.data import DataLoader, TensorDataset
-
-from mlops_group35.model import Model
-
 """Training pipeline
 
 This module handles:
@@ -18,6 +5,19 @@ This module handles:
 - model training and evaluation
 - saving trained model and metrics
 """
+
+import argparse
+import json
+from dataclasses import asdict, dataclass
+from pathlib import Path
+
+import torch
+import yaml
+from torch import nn
+from torch.utils.data import DataLoader, TensorDataset
+
+from mlops_group35.model import Model
+
 
 @dataclass(frozen=True)
 class TrainConfig:
@@ -166,17 +166,22 @@ def train(cfg: TrainConfig) -> dict:
 
     return metrics
 
-import argparse
-
+def load_config(path: str) -> dict:
+    with open(path, "r", encoding="utf-8") as f:
+        return yaml.safe_load(f)
 
 def main() -> None:
     parser = argparse.ArgumentParser()
-    parser.add_argument("--epochs", type=int, default=20)
-    parser.add_argument("--lr", type=float, default=1e-3)
+    parser.add_argument("--config", type=str, default=None, help="Path to a YAML config file.")
     args = parser.parse_args()
 
-    cfg = TrainConfig(epochs=args.epochs, lr=args.lr)
+    cfg_dict = {}
+    if args.config is not None:
+        cfg_dict = load_config(args.config)
+
+    cfg = TrainConfig(**cfg_dict)
     train(cfg)
+
 
 if __name__ == "__main__":
     main()
