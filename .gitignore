@@ -139,3 +139,4 @@ manual_test/
 models/*.pkl
 models/*.pt
 models/*.ckpt
+data/
