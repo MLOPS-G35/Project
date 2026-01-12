@@ -1,8 +1,11 @@
 import torch
 from torch import nn
 
+"""Neural network model definitions"""
 
 class Model(nn.Module):
+    
+    """Simple MLP regressor for 1D input → 1D output."""
 
     def __init__(self, hidden_dim: int = 32):
         super().__init__()

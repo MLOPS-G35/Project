@@ -11,6 +11,13 @@ from torch.utils.data import DataLoader, TensorDataset
 
 from mlops_group35.model import Model
 
+"""Training pipeline
+
+This module handles:
+- data loading (currently synthetic data)
+- model training and evaluation
+- saving trained model and metrics
+"""
 
 @dataclass(frozen=True)
 class TrainConfig:
