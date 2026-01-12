@@ -93,7 +93,6 @@ def evaluate(model: nn.Module, loader: DataLoader, device: torch.device) -> floa
 
 
 def train(cfg: TrainConfig) -> dict:
-
     """Train the model using the provided configuration.
 
     Args:
@@ -198,12 +197,12 @@ def main(cfg: DictConfig) -> None:
         stats = pstats.Stats(train_cfg.profile_path)
         stats.strip_dirs().sort_stats("cumtime")
 
-        stats.print_stats(25) #.pstat
+        stats.print_stats(25)  # .pstat
 
         txt_path = Path(train_cfg.profile_path).with_suffix(".txt")
         with txt_path.open("w", encoding="utf-8") as f:
             stats.stream = f
-            stats.print_stats(50) #.txt
+            stats.print_stats(50)  # .txt
 
     else:
         train(train_cfg)
