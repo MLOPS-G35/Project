@@ -7,6 +7,8 @@ This module handles:
 """
 
 import json
+import cProfile
+import pstats
 from dataclasses import asdict, dataclass
 from pathlib import Path
 
@@ -37,6 +39,8 @@ class TrainConfig:
         out_dir: Directory where models are saved.
         metrics_path: Path to metrics JSON file.
         model_path: Path to trained model file.
+        profile: Enable cProfile profiling.
+        profile_path: Output path for profiling stats (.pstats).
     """
 
     seed: int = 42
@@ -50,6 +54,8 @@ class TrainConfig:
     out_dir: str = "models"
     metrics_path: str = "reports/metrics.json"
     model_path: str = "models/model.pt"
+    profile: bool = False
+    profile_path: str = "reports/profile.pstats"
 
 
 def set_seed(seed: int) -> None:
@@ -175,11 +181,33 @@ def main(cfg: DictConfig) -> None:
 
     Path("reports").mkdir(parents=True, exist_ok=True)
     OmegaConf.save(cfg, "reports/config.yaml")
-    
+
     # Hydra -> dict -> dataclass
     cfg_dict = OmegaConf.to_container(cfg, resolve=True)
     train_cfg = TrainConfig(**cfg_dict)  # type: ignore[arg-type]
-    train(train_cfg)
+
+    if train_cfg.profile:
+        Path(train_cfg.profile_path).parent.mkdir(parents=True, exist_ok=True)
+
+        profiler = cProfile.Profile()
+        profiler.enable()
+        train(train_cfg)
+        profiler.disable()
+
+        profiler.dump_stats(train_cfg.profile_path)
+        stats = pstats.Stats(train_cfg.profile_path)
+        stats.strip_dirs().sort_stats("cumtime")
+
+        stats.print_stats(25) #.pstat
+
+        txt_path = Path(train_cfg.profile_path).with_suffix(".txt")
+        with txt_path.open("w", encoding="utf-8") as f:
+            stats.stream = f
+            stats.print_stats(50) #.txt
+
+    else:
+        train(train_cfg)
+
 
 if __name__ == "__main__":
     main()

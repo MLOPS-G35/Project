@@ -15,3 +15,6 @@ model_path: "models/model.pt"
 hydra:
   run:
     dir: .
+
+profile: false
+profile_path: "reports/profile.pstats"
