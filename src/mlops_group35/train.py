@@ -130,7 +130,9 @@ def train(cfg: TrainConfig, run: wandb.sdk.wandb_run.Run | None = None) -> dict[
     # Ensure output dirs exist
     Path(cfg.out_dir).mkdir(parents=True, exist_ok=True)
     Path(Path(cfg.metrics_path).parent).mkdir(parents=True, exist_ok=True)
-    logger.debug("Ensured output directories exist: out_dir=%s metrics_dir=%s", cfg.out_dir, Path(cfg.metrics_path).parent)
+    logger.debug(
+        "Ensured output directories exist: out_dir=%s metrics_dir=%s", cfg.out_dir, Path(cfg.metrics_path).parent
+    )
 
     # Data
     x, y = make_synthetic_regression(cfg.n_samples, cfg.noise_std)
@@ -248,7 +250,6 @@ def main(cfg: DictConfig) -> None:
     cfg_dict = {k: v for k, v in cfg_dict.items() if k not in wandb_keys}
 
     train_cfg = TrainConfig(**cfg_dict)
-
 
     # ----- W&B init (minimal, controlled via config) -----
     use_wandb = bool(cfg.get("use_wandb", False))
