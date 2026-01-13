@@ -31,7 +31,7 @@ class MyDataset(Dataset):
     def __getitem__(self, index: int):
         """Return a given sample from the dataset."""
         return self.data[index]
-        #return self.data.iloc[index]
+        # return self.data.iloc[index]
 
     def preprocess(self, output_folder: Path) -> None:
         """Preprocess the raw data and save it to the output folder."""
@@ -50,4 +50,4 @@ def preprocess(data_path: Path, output_folder: Path) -> None:
 if __name__ == "__main__":
     print("Preprocessing data main...")
     typer.run(preprocess)
-    #preprocess(Path("data/raw"), Path("data/preprocessed"))
+    # preprocess(Path("data/raw"), Path("data/preprocessed"))
