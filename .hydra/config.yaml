@@ -11,3 +11,7 @@ metrics_path: reports/metrics.json
 model_path: models/model.pt
 profile: false
 profile_path: reports/profile.pstats
+use_wandb: true
+wandb_project: mlops_group35
+wandb_mode: online
+wandb_run_name: null

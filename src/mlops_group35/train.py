@@ -13,9 +13,11 @@ import pstats
 import time
 from dataclasses import asdict, dataclass
 from pathlib import Path
+from typing import Any
 
 import hydra
 import torch
+import wandb
 from omegaconf import DictConfig, OmegaConf
 from torch import nn
 from torch.utils.data import DataLoader, TensorDataset
@@ -99,11 +101,12 @@ def evaluate(model: nn.Module, loader: DataLoader, device: torch.device) -> floa
     return avg_loss
 
 
-def train(cfg: TrainConfig) -> dict:
+def train(cfg: TrainConfig, run: wandb.sdk.wandb_run.Run | None = None) -> dict[str, Any]:
     """Train the model using the provided configuration.
 
     Args:
         cfg: Training configuration.
+        run: Optional W&B run to log metrics/artifacts.
 
     Returns:
         Dictionary containing final training and validation metrics.
@@ -127,7 +130,9 @@ def train(cfg: TrainConfig) -> dict:
     # Ensure output dirs exist
     Path(cfg.out_dir).mkdir(parents=True, exist_ok=True)
     Path(Path(cfg.metrics_path).parent).mkdir(parents=True, exist_ok=True)
-    logger.debug("Ensured output directories exist: out_dir=%s metrics_dir=%s", cfg.out_dir, Path(cfg.metrics_path).parent)
+    logger.debug(
+        "Ensured output directories exist: out_dir=%s metrics_dir=%s", cfg.out_dir, Path(cfg.metrics_path).parent
+    )
 
     # Data
     x, y = make_synthetic_regression(cfg.n_samples, cfg.noise_std)
@@ -173,7 +178,7 @@ def train(cfg: TrainConfig) -> dict:
         train_mse = epoch_loss / max(n_batches, 1)
         val_mse = evaluate(model, val_loader, device)
 
-        # Keep the original behavior (print) + add logging
+        # Keep original behavior (print) + add logging
         print(f"Epoch {epoch:02d}/{cfg.epochs} | train_mse={train_mse:.6f} | val_mse={val_mse:.6f}")
         logger.info(
             "Epoch %02d/%d | train_mse=%.6f | val_mse=%.6f",
@@ -182,6 +187,13 @@ def train(cfg: TrainConfig) -> dict:
             train_mse,
             val_mse,
         )
+
+        # W&B metrics
+        if run is not None:
+            run.log(
+                {"epoch": epoch, "train_mse": float(train_mse), "val_mse": float(val_mse)},
+                step=epoch,
+            )
 
     # Save model
     payload = {
@@ -194,7 +206,7 @@ def train(cfg: TrainConfig) -> dict:
     logger.info("Saved model to %s", cfg.model_path)
 
     # Save metrics
-    metrics = {
+    metrics: dict[str, Any] = {
         "train_mse": float(train_mse),
         "val_mse": float(val_mse),
         "epochs": cfg.epochs,
@@ -205,6 +217,11 @@ def train(cfg: TrainConfig) -> dict:
     with open(cfg.metrics_path, "w", encoding="utf-8") as f:
         json.dump(metrics, f, indent=2)
     logger.info("Saved metrics to %s", cfg.metrics_path)
+
+    # W&B summary (final numbers)
+    if run is not None:
+        run.summary["final_train_mse"] = float(train_mse)
+        run.summary["final_val_mse"] = float(val_mse)
 
     elapsed = time.time() - start_time
     logger.info("train() completed in %.2fs", elapsed)
@@ -228,9 +245,27 @@ def main(cfg: DictConfig) -> None:
     OmegaConf.save(cfg, "reports/config.yaml")
     logger.info("Saved Hydra config to reports/config.yaml")
 
-    # Hydra -> dict -> dataclass
     cfg_dict = OmegaConf.to_container(cfg, resolve=True)
-    train_cfg = TrainConfig(**cfg_dict)  # type: ignore[arg-type]
+    wandb_keys = {"use_wandb", "wandb_project", "wandb_mode", "wandb_run_name"}
+    cfg_dict = {k: v for k, v in cfg_dict.items() if k not in wandb_keys}
+
+    train_cfg = TrainConfig(**cfg_dict)
+
+    # ----- W&B init (minimal, controlled via config) -----
+    use_wandb = bool(cfg.get("use_wandb", False))
+    wandb_project = str(cfg.get("wandb_project", "mlops_group35"))
+    wandb_mode = str(cfg.get("wandb_mode", "offline"))
+    wandb_run_name = cfg.get("wandb_run_name", None)
+
+    run: wandb.sdk.wandb_run.Run | None = None
+    if use_wandb:
+        run = wandb.init(
+            project=wandb_project,
+            name=str(wandb_run_name) if wandb_run_name is not None else None,
+            config=OmegaConf.to_container(cfg, resolve=True),
+            mode=wandb_mode,
+        )
+        logger.info("W&B initialized: project=%s mode=%s", wandb_project, wandb_mode)
 
     try:
         if train_cfg.profile:
@@ -239,7 +274,7 @@ def main(cfg: DictConfig) -> None:
 
             profiler = cProfile.Profile()
             profiler.enable()
-            train(train_cfg)
+            train(train_cfg, run=run)
             profiler.disable()
 
             profiler.dump_stats(train_cfg.profile_path)
@@ -248,21 +283,44 @@ def main(cfg: DictConfig) -> None:
             stats = pstats.Stats(train_cfg.profile_path)
             stats.strip_dirs().sort_stats("cumtime")
 
-            stats.print_stats(25)  # .pstat
+            stats.print_stats(25)  # console
 
             txt_path = Path(train_cfg.profile_path).with_suffix(".txt")
             with txt_path.open("w", encoding="utf-8") as f:
                 stats.stream = f
-                stats.print_stats(50)  # .txt
+                stats.print_stats(50)
             logger.info("Saved profiling report to %s", txt_path)
 
         else:
             logger.info("Profiling disabled")
-            train(train_cfg)
+            train(train_cfg, run=run)
+
+        # ----- W&B artifacts (model + metrics + config + optional profile) -----
+        if run is not None:
+            artifact = wandb.Artifact(name="training-artifacts", type="model")
+            if Path("reports/config.yaml").exists():
+                artifact.add_file("reports/config.yaml")
+            if Path(train_cfg.metrics_path).exists():
+                artifact.add_file(train_cfg.metrics_path)
+            if Path(train_cfg.model_path).exists():
+                artifact.add_file(train_cfg.model_path)
+
+            if train_cfg.profile and Path(train_cfg.profile_path).exists():
+                artifact.add_file(train_cfg.profile_path)
+                txt_path = Path(train_cfg.profile_path).with_suffix(".txt")
+                if txt_path.exists():
+                    artifact.add_file(str(txt_path))
+
+            run.log_artifact(artifact)
+            logger.info("Logged W&B artifact (config/metrics/model + optional profiling)")
 
     except Exception:
         logger.exception("Training run failed with an exception")
         raise
+    finally:
+        if run is not None:
+            run.finish()
+            logger.info("W&B run finished")
 
 
 if __name__ == "__main__":
