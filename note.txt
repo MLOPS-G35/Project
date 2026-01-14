@@ -1,0 +1,8 @@
+
+Run data.py
+
+
+
+Run test:
+uv run pytest
+uv run pytest -s

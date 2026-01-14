@@ -1,9 +1,42 @@
-from torch.utils.data import Dataset
+import os
 
-from mlops_group35.data import MyDataset
+from tests import _PATH_DATA
+import pandas as pd
 
+NUM_ROWS = 691
+NUM_COLS = 24
+CSV_PATH = os.path.join(_PATH_DATA, "processed", "combined.csv")
+DF = pd.read_csv(CSV_PATH)
+# use df = DF.copy(deep=True) if you are going to modify the data in any ways
 
-def test_my_dataset():
+def test_dataset():
     """Test the MyDataset class."""
-    dataset = MyDataset("data/raw")
-    assert isinstance(dataset, Dataset)
+    df = DF
+    assert df is not None
+    assert not df.empty, "Dataset should not be empty"
+
+    assert len(df.columns) == NUM_COLS, f"Dataset should have {NUM_COLS} columns"
+
+    assert len(df) >= NUM_ROWS, f"Dataset should have at least {NUM_ROWS} rows"
+
+
+REQUIRED_COLUMNS = {
+    'ScanDir ID', 'Site', 'Gender', 'Age', 'Handedness', 'DX',
+   'Secondary Dx ', 'ADHD Measure', 'ADHD Index', 'Inattentive',
+   'Hyper/Impulsive', 'IQ Measure', 'Verbal IQ', 'Performance IQ',
+   'Full2 IQ', 'Full4 IQ', 'Med Status', 'QC_Rest_1', 'QC_Rest_2',
+   'QC_Rest_3', 'QC_Rest_4', 'QC_Anatomical_1', 'QC_Anatomical_2', 'ID'
+}
+
+def test_required_columns():
+    df = DF
+    print(df.columns)
+    missing = REQUIRED_COLUMNS - set(DF.columns)
+    assert not missing, f"Missing columns: {missing}"
+
+
+
+def test_no_all_missing_columns():
+    df = DF
+    all_missing = df.columns[df.isna().all()]
+    assert len(all_missing) == 0, f"Columns with only NaNs: {list(all_missing)}"
