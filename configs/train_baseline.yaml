@@ -10,7 +10,12 @@ noise_std: 0.1
 out_dir: "models"
 metrics_path: "reports/metrics.json"
 model_path: "models/model.pt"
-# data_path: ""
+
+# CSV data (optional; default uses synthetic data)
+use_csv: false
+csv_path: "data/processed/combined.csv"
+x_col: "Age"
+y_col: "Full4 IQ"
 
 hydra:
   run:

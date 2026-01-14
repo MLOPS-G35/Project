@@ -112,17 +112,11 @@ hydra:
     hydra:
     - hydra.mode=RUN
     task:
-    - use_wandb=true
-    - wandb_mode=online
-    - wandb_project=MLOps_group35-src_mlops_group35
-    - lr=${lr}
-    - batch_size=${batch_size}
-    - hidden_dim=${hidden_dim}
-    - epochs=${epochs}
+    - use_csv=true
   job:
     name: train
     chdir: null
-    override_dirname: batch_size=${batch_size},epochs=${epochs},hidden_dim=${hidden_dim},lr=${lr},use_wandb=true,wandb_mode=online,wandb_project=MLOps_group35-src_mlops_group35
+    override_dirname: use_csv=true
     id: ???
     num: ???
     config_name: train_baseline

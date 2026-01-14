@@ -16,6 +16,7 @@ from pathlib import Path
 from typing import Any
 
 import hydra
+import pandas as pd
 import torch
 import wandb
 from omegaconf import DictConfig, OmegaConf
@@ -61,6 +62,12 @@ class TrainConfig:
     profile: bool = False
     profile_path: str = "reports/profile.pstats"
 
+    # CSV data (optional; default keeps current synthetic behavior)
+    use_csv: bool = False
+    csv_path: str = "data/processed/combined.csv"
+    x_col: str = "Age"
+    y_col: str = "Full4 IQ"
+
 
 def set_seed(seed: int) -> None:
     logger.info("Setting seed=%d", seed)
@@ -80,6 +87,19 @@ def make_synthetic_regression(n: int, noise_std: float) -> tuple[torch.Tensor, t
     noise = noise_std * torch.randn(n, 1)
     y = 3.0 * x - 0.5 + noise
     logger.debug("Generated tensors: x_shape=%s y_shape=%s", tuple(x.shape), tuple(y.shape))
+    return x, y
+
+
+def load_csv_regression(csv_path: str, x_col: str, y_col: str) -> tuple[torch.Tensor, torch.Tensor]:
+    df = pd.read_csv(csv_path)
+
+    if x_col not in df.columns or y_col not in df.columns:
+        raise ValueError(f"Missing columns in CSV. Need x_col={x_col}, y_col={y_col}.")
+
+    df = df[[x_col, y_col]].dropna()
+
+    x = torch.tensor(df[x_col].to_numpy(), dtype=torch.float32).unsqueeze(1)
+    y = torch.tensor(df[y_col].to_numpy(), dtype=torch.float32).unsqueeze(1)
     return x, y
 
 
@@ -135,9 +155,16 @@ def train(cfg: TrainConfig, run: wandb.sdk.wandb_run.Run | None = None) -> dict[
     )
 
     # Data
-    x, y = make_synthetic_regression(cfg.n_samples, cfg.noise_std)
-    n_val = int(cfg.n_samples * cfg.val_split)
-    n_train = cfg.n_samples - n_val
+    if cfg.use_csv:
+        logger.info("Loading data from CSV: %s (x_col=%s, y_col=%s)", cfg.csv_path, cfg.x_col, cfg.y_col)
+        x, y = load_csv_regression(cfg.csv_path, cfg.x_col, cfg.y_col)
+        logger.info("Loaded CSV tensors: x_shape=%s y_shape=%s", tuple(x.shape), tuple(y.shape))
+    else:
+        x, y = make_synthetic_regression(cfg.n_samples, cfg.noise_std)
+
+    n_total = x.shape[0]
+    n_val = int(n_total * cfg.val_split)
+    n_train = n_total - n_val
 
     x_train, y_train = x[:n_train], y[:n_train]
     x_val, y_val = x[n_train:], y[n_train:]
@@ -227,6 +254,7 @@ def train(cfg: TrainConfig, run: wandb.sdk.wandb_run.Run | None = None) -> dict[
         final_val_mse = float(val_mse)
         run.log({"final_val_mse": final_val_mse}, step=cfg.epochs)
 
+    return metrics
 
 
 @hydra.main(version_base="1.3", config_path="../../configs", config_name="train_baseline")
@@ -245,12 +273,6 @@ def main(cfg: DictConfig) -> None:
     OmegaConf.save(cfg, "reports/config.yaml")
     logger.info("Saved Hydra config to reports/config.yaml")
 
-    cfg_dict = OmegaConf.to_container(cfg, resolve=True)
-    wandb_keys = {"use_wandb", "wandb_project", "wandb_mode", "wandb_run_name"}
-    cfg_dict = {k: v for k, v in cfg_dict.items() if k not in wandb_keys}
-
-    train_cfg = TrainConfig(**cfg_dict)
-
     # ----- W&B init (minimal, controlled via config) -----
     use_wandb = bool(cfg.get("use_wandb", False))
     wandb_project = str(cfg.get("wandb_project", "mlops_group35"))
@@ -262,10 +284,24 @@ def main(cfg: DictConfig) -> None:
         run = wandb.init(
             project=wandb_project,
             name=str(wandb_run_name) if wandb_run_name is not None else None,
-            config=OmegaConf.to_container(cfg, resolve=True),
             mode=wandb_mode,
         )
         logger.info("W&B initialized: project=%s mode=%s", wandb_project, wandb_mode)
+
+        # >>> applica i parametri dello sweep a Hydra cfg <<<
+        sweep_overrides = dict(run.config)
+        allowed = set(TrainConfig.__dataclass_fields__.keys())
+        sweep_overrides = {k: v for k, v in sweep_overrides.items() if k in allowed}
+
+        if sweep_overrides:
+            logger.info("Applying sweep overrides to Hydra cfg: %s", sweep_overrides)
+            cfg = OmegaConf.merge(cfg, OmegaConf.create(sweep_overrides))
+
+    # Ora che cfg include eventuali overrides, costruisci TrainConfig
+    cfg_dict = OmegaConf.to_container(cfg, resolve=True)
+    wandb_keys = {"use_wandb", "wandb_project", "wandb_mode", "wandb_run_name"}
+    cfg_dict = {k: v for k, v in cfg_dict.items() if k not in wandb_keys}
+    train_cfg = TrainConfig(**cfg_dict)
 
     try:
         if train_cfg.profile:
