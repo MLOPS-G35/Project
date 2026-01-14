@@ -113,10 +113,11 @@ hydra:
     - hydra.mode=RUN
     task:
     - use_csv=true
+    - n_clusters=5
   job:
     name: train
     chdir: null
-    override_dirname: use_csv=true
+    override_dirname: n_clusters=5,use_csv=true
     id: ???
     num: ???
     config_name: train_baseline

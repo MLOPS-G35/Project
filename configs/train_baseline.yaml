@@ -11,11 +11,23 @@ out_dir: "models"
 metrics_path: "reports/metrics.json"
 model_path: "models/model.pt"
 
-# CSV data (optional; default uses synthetic data)
+# CSV data (optional; when true runs clustering)
 use_csv: false
 csv_path: "data/processed/combined.csv"
-x_col: "Age"
-y_col: "Full4 IQ"
+
+# Clustering config
+id_col: "ScanDir ID"
+feature_cols:
+  - Age
+  - Gender
+  - Handedness
+  - Verbal IQ
+  - Performance IQ
+  - Full4 IQ
+  - ADHD Index
+  - Inattentive
+  - Hyper/Impulsive
+n_clusters: 5
 
 hydra:
   run:
