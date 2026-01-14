@@ -1,1 +1,7 @@
-[]
+- use_wandb=true
+- wandb_mode=online
+- wandb_project=MLOps_group35-src_mlops_group35
+- lr=${lr}
+- batch_size=${batch_size}
+- hidden_dim=${hidden_dim}
+- epochs=${epochs}

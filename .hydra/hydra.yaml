@@ -111,11 +111,18 @@ hydra:
   overrides:
     hydra:
     - hydra.mode=RUN
-    task: []
+    task:
+    - use_wandb=true
+    - wandb_mode=online
+    - wandb_project=MLOps_group35-src_mlops_group35
+    - lr=${lr}
+    - batch_size=${batch_size}
+    - hidden_dim=${hidden_dim}
+    - epochs=${epochs}
   job:
     name: train
     chdir: null
-    override_dirname: ''
+    override_dirname: batch_size=${batch_size},epochs=${epochs},hidden_dim=${hidden_dim},lr=${lr},use_wandb=true,wandb_mode=online,wandb_project=MLOps_group35-src_mlops_group35
     id: ???
     num: ???
     config_name: train_baseline

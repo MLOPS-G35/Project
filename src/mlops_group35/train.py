@@ -223,10 +223,10 @@ def train(cfg: TrainConfig, run: wandb.sdk.wandb_run.Run | None = None) -> dict[
         run.summary["final_train_mse"] = float(train_mse)
         run.summary["final_val_mse"] = float(val_mse)
 
-    elapsed = time.time() - start_time
-    logger.info("train() completed in %.2fs", elapsed)
+        # >>> ADD THIS (for sweeps) <<<
+        final_val_mse = float(val_mse)
+        run.log({"final_val_mse": final_val_mse}, step=cfg.epochs)
 
-    return metrics
 
 
 @hydra.main(version_base="1.3", config_path="../../configs", config_name="train_baseline")
