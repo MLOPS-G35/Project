@@ -46,6 +46,23 @@ def preprocess(data_path: Path, output_folder: Path) -> None:
     print(dataset.data.head(10))
 
 
+def load_csv_for_clustering(
+    csv_path: str,
+    id_col: str,
+    feature_cols: tuple[str, ...],
+) -> tuple[pd.Series, pd.DataFrame]:
+    df = pd.read_csv(csv_path)
+
+    needed = [id_col, *feature_cols]
+    missing = [c for c in needed if c not in df.columns]
+    if missing:
+        raise ValueError(f"Missing columns in CSV: {missing}")
+
+    #TODO
+    df = df[needed].replace(-999, pd.NA).dropna()
+    return df[id_col], df[list(feature_cols)]
+
+
 if __name__ == "__main__":
     print("Preprocessing data main...")
     typer.run(preprocess)
