@@ -82,4 +82,3 @@ def test_train_returns_clusters(mock_loader, mock_metrics, tmp_path, monkeypatch
     # Assertions
     assert len(clusters) == 4
     assert set(clusters) <= {0, 1}
-

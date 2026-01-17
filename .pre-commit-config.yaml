@@ -7,3 +7,4 @@ repos:
     -   id: trailing-whitespace       # Removes spaces or tabs at the end of lines.
     -   id: end-of-file-fixer         # Ensures every file ends with exactly one newline.
     -   id: check-yaml                # Validates .yml / .yaml files for syntax errors.
+    -   id: check-json

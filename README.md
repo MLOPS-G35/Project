@@ -2,7 +2,7 @@
 
 Project synopsis - Group - 35
 
-Title: Identifying neurodiversity 
+Title: Identifying neurodiversity
 
 ## Motivation and Goal
 
@@ -21,7 +21,7 @@ The project uses the ADHD200 Preprocessed Anatomical Dataset (anonymized and pub
 
 Due to the large size of the dataset (exceeding 20 GB) and the presence of inter-site variability arising from differences in MRI scanners, acquisition protocols, and image quality, the initial analysis will focus on data from a subset of acquisition sites (specifically NYU, OHSU and Peking_1). This choice helps reduce computational complexity and limit differences between data coming from different acquisition sites, while still allowing us to extend the analysis to additional sites later in the project.
 
-## References: 
+## References:
 
 https://www.kaggle.com/datasets/purnimakumarrr/adhd200-preprocessed-anatomical-dataset
 https://fcon_1000.projects.nitrc.org/indi/adhd200/
@@ -78,4 +78,3 @@ The directory structure of the project looks like this:
 Created using [mlops_template](https://github.com/SkafteNicki/mlops_template),
 a [cookiecutter template](https://github.com/cookiecutter/cookiecutter) for getting
 started with Machine Learning Operations (MLOps).
-
