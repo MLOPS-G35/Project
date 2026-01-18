@@ -1,5 +1,6 @@
 from pathlib import Path
 import pandas as pd
+pd.set_option("display.max_columns", None)
 
 import typer
 from torch.utils.data import Dataset

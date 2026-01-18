@@ -4,17 +4,17 @@ metrics_path: reports/metrics.json
 profile: false
 profile_path: reports/profile.pstats
 
-id_col: "ScanDir ID"
+id_col: "scandir_id"
 feature_cols:
-  - Age
-  - Gender
-  - Handedness
-  - Verbal IQ
-  - Performance IQ
-  - Full4 IQ
-  - ADHD Index
-  - Inattentive
-  - Hyper/Impulsive
+  - age
+  - gender
+  - handedness
+  - verbal_iq
+  - performance_iq
+  - full4_iq
+  - adhd_index
+  - inattentive
+  - hyper/impulsive
 
 n_clusters: 5
 
