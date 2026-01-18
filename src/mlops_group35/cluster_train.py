@@ -101,20 +101,14 @@ def generate_and_save_metrics(cfg, feats, kmeans, x_scaled, clusters, ids, run):
 
 
 
-def train(cfg: TrainConfig, run: wandb.sdk.wandb_run.Run | None = None) -> dict[str, Any]:
+def train(cfg, ids, feats, run: None = None) -> dict[str, Any]:
     logger.info("Starting clustering pipeline")
     logger.info("CSV path: %s | n_clusters=%d", cfg.csv_path, cfg.n_clusters)
 
     Path("reports").mkdir(parents=True, exist_ok=True)
     Path(Path(cfg.metrics_path).parent).mkdir(parents=True, exist_ok=True)
 
-    # ---- Load data ----
-    ids, feats = load_csv_for_clustering(cfg.csv_path, cfg.id_col, cfg.feature_cols)
-    logger.info(
-        "Clustering data shape: n_samples=%d n_features=%d",
-        len(feats),
-        feats.shape[1],
-    )
+
 
     # ---- Preprocessing ----
     x_scaled = StandardScaler().fit_transform(feats.to_numpy(dtype=float))
@@ -133,22 +127,32 @@ def train(cfg: TrainConfig, run: wandb.sdk.wandb_run.Run | None = None) -> dict[
 
 
 def run_training_with_optional_profiling(
-    train_cfg: TrainConfig,
+    cfg: TrainConfig,
     run: wandb.sdk.wandb_run.Run | None,
 ) -> None:
-    if not train_cfg.profile:
-        train(train_cfg, run=run)
+
+    # ---- Load data ----
+    ids, feats = load_csv_for_clustering(cfg.csv_path, cfg.id_col, cfg.feature_cols)
+    logger.info(
+        "Clustering data shape: n_samples=%d n_features=%d",
+        len(feats),
+        feats.shape[1],
+    )
+
+
+    if not cfg.profile:
+        train(cfg, ids, feats, run=run)
         return
 
     profiler = cProfile.Profile()
     profiler.enable()
 
-    train(train_cfg, run=run)
+    train(cfg, ids, feats, run=run)
 
     profiler.disable()
-    profiler.dump_stats(train_cfg.profile_path)
+    profiler.dump_stats(cfg.profile_path)
 
-    stats = pstats.Stats(train_cfg.profile_path)
+    stats = pstats.Stats(cfg.profile_path)
     stats.sort_stats("cumtime").print_stats(25)
 
 
