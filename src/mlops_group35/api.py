@@ -68,4 +68,5 @@ def predict(data: PredictionInput):
 
     print(df.tail(5))
 
+
     return {"features_used"}

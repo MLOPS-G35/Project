@@ -1,6 +1,8 @@
 from pathlib import Path
 import pandas as pd
 pd.set_option("display.max_columns", None)
+pd.set_option('display.max_rows', None)
+pd.set_option('display.width', 2000)
 
 import typer
 from torch.utils.data import Dataset
@@ -61,14 +63,15 @@ def preprocess(data_path: Path, output_folder: Path) -> None:
 def load_preprocessed_data(csv_path: str, required_columns):
     df = pd.read_csv(csv_path)
 
-    required = set(required_columns)
-    required.add("scandir_id")
+    # Ensure scandir_id is first
+    required = ["scandir_id"] + [c for c in required_columns if c != "scandir_id"]
 
-    missing = required - set(df.columns)
+    missing = set(required) - set(df.columns)
     if missing:
         raise ValueError(f"Missing columns in CSV: {missing}")
 
-    return df[list(required)]
+    return df[required]
+
 
 
 
