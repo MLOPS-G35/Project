@@ -3,7 +3,7 @@ from unittest.mock import patch
 import pandas as pd
 from omegaconf import OmegaConf
 
-import mlops_group35.cluster_train as c_train
+import mlops_group35.train as train
 from mlops_group35.config import TrainConfig
 
 
@@ -21,14 +21,14 @@ def test_build_train_config_filters_wandb_keys():
         }
     )
 
-    train_cfg = c_train.build_train_config(cfg)
+    train_cfg = train.build_train_config(cfg)
 
     assert isinstance(train_cfg, TrainConfig)
     assert train_cfg.csv_path == "data.csv"
     assert not hasattr(train_cfg, "use_wandb")
 
 
-@patch("mlops_group35.cluster_train.generate_and_save_metrics")
+@patch("mlops_group35.train.generate_and_save_metrics")
 def test_train_calls_metrics_function(mock_metrics, tmp_path, monkeypatch):
     monkeypatch.chdir(tmp_path)
 
@@ -52,12 +52,12 @@ def test_train_calls_metrics_function(mock_metrics, tmp_path, monkeypatch):
         profile_path="reports/profile.prof",
     )
 
-    c_train.train_with_config(cfg, df, run=None)
+    train.train_with_config(cfg, df, run=None)
 
     mock_metrics.assert_called_once()
 
 
-@patch("mlops_group35.cluster_train.generate_and_save_metrics")
+@patch("mlops_group35.train.generate_and_save_metrics")
 def test_train_returns_clusters(mock_metrics, tmp_path, monkeypatch):
     monkeypatch.chdir(tmp_path)
 
@@ -81,7 +81,7 @@ def test_train_returns_clusters(mock_metrics, tmp_path, monkeypatch):
         profile_path="reports/profile.prof",
     )
 
-    clusters = c_train.train_with_config(cfg, df, run=None)
+    clusters = train.train_with_config(cfg, df, run=None)
 
     # Assertions
     assert len(clusters) == 4
