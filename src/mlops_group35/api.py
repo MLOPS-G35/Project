@@ -60,7 +60,6 @@ def predict(data: PredictionInput):
 
     # Append to dataset
     df_with_new = pd.concat([df, new_row], ignore_index=True)
-    print(df_with_new.tail(5))
 
     df_out, kmeans, X_scaled = cluster_train.train(
         df_with_new,
@@ -68,7 +67,6 @@ def predict(data: PredictionInput):
         train_cfg.seed
     )
 
-    print(df_out.tail(5))
     # Get user's cluster
     user_cluster = df_out.iloc[-1]["cluster"]
     #TODO ATM it returns the cluster number, but it should return some interpretations

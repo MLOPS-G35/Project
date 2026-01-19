@@ -16,7 +16,6 @@ from pathlib import Path
 from typing import Any
 import numpy as np
 from sklearn.impute import SimpleImputer
-
 import hydra
 import pandas as pd
 import wandb
@@ -24,12 +23,10 @@ from omegaconf import DictConfig, OmegaConf
 from sklearn.cluster import KMeans
 from sklearn.metrics import silhouette_score
 from sklearn.preprocessing import StandardScaler
-
 from mlops_group35.config import TrainConfig
 from mlops_group35.data import load_preprocessed_data
 
 CONFIG_YAML_FILE = "reports/cluster_config.yaml"
-
 logger = logging.getLogger(__name__)
 
 def setup_logging_and_dirs(cfg: DictConfig) -> None:
@@ -193,7 +190,6 @@ def run_training_with_optional_profiling(
 
     stats = pstats.Stats(cfg.profile_path)
     stats.sort_stats("cumtime").print_stats(25)
-
 
 
 
