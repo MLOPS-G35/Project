@@ -117,10 +117,8 @@ def train_config(cfg, df, run: None = None) -> dict[str, Any]:
 
 
 def train(df, n_clusters, seed):
-    # ---- Preprocessing ----
     X_scaled = _process_data(df)
 
-    # ---- Clustering ----
     kmeans = KMeans(
         n_clusters=n_clusters,
         random_state=seed,
@@ -128,8 +126,14 @@ def train(df, n_clusters, seed):
     )
     clusters = kmeans.fit_predict(X_scaled)
 
+    df_out = df.copy()
+    df_out["cluster"] = clusters
+    return df_out, kmeans, X_scaled
+
+
 
 def _process_data(df):
+    #TODO apply one-hot-encode for gender
     df2 = df.drop(
         columns=["scandir_id", "site", "full2_iq", "qc_rest_3", "qc_rest_4",
                  "qc_anatomical_2", "secondary_dx"],

@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 from http import HTTPStatus
 from hydra import initialize, compose
-
+import pandas as pd
 from pydantic import BaseModel
 
 from mlops_group35 import cluster_train
@@ -44,21 +44,6 @@ def read_item(item_id: int):
 def predict(data: PredictionInput):
     required_feats = data.model_fields.keys()
 
-
-    # data_dict = {
-    #     "Age": data.Age,
-    #     "Gender": data.Gender,
-    #     "Handedness": data.Handedness,
-    #     "Verbal IQ": data.Verbal_IQ,
-    #     "Performance IQ": data.Performance_IQ,
-    #     "Full4 IQ": data.Full4_IQ,
-    #     "ADHD Index": data.ADHD_Index,
-    #     "Inattentive": data.Inattentive,
-    #     "Hyper/Impulsive": data.Hyper_Impulsive,
-    # }
-
-
-
     with initialize(config_path="../../configs", version_base="1.3"):
         cfg = compose(config_name="cluster")
 
@@ -67,7 +52,24 @@ def predict(data: PredictionInput):
     csv_path = "data/processed/combined.csv"
     df = load_preprocessed_data(csv_path, required_feats)
 
-    print(df.tail(5))
-    cluster_train.train(df, train_cfg.n_clusters, train_cfg.seed)
 
-    return {"features_used"}
+    # Convert input to DataFrame
+    new_row = pd.DataFrame([data.model_dump()])
+    new_row = new_row[required_feats]
+
+
+    # Append to dataset
+    df_with_new = pd.concat([df, new_row], ignore_index=True)
+    print(df_with_new.tail(5))
+
+    df_out, kmeans, X_scaled = cluster_train.train(
+        df_with_new,
+        train_cfg.n_clusters,
+        train_cfg.seed
+    )
+
+    print(df_out.tail(5))
+    # Get user's cluster
+    user_cluster = df_out.iloc[-1]["cluster"]
+    #TODO ATM it returns the cluster number, but it should return some interpretations
+    return {"Group": int(user_cluster)}
