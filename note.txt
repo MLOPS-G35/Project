@@ -21,3 +21,7 @@ docker run -d \
   --restart unless-stopped \
   -p 8000:8000 \
   ghcr.io/emilianocarrara/mlops_group35-api
+
+
+Frontend:
+uv run streamlit run frontend/app.py
