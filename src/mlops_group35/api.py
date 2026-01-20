@@ -4,8 +4,7 @@ from hydra import initialize, compose
 import pandas as pd
 from pydantic import BaseModel
 
-from mlops_group35 import cluster_train
-from mlops_group35.cluster_train import build_train_config
+from mlops_group35 import train
 from mlops_group35.data import load_preprocessed_data
 
 
@@ -23,6 +22,7 @@ class PredictionInput(BaseModel):
 
 app = FastAPI()
 
+print("Api is starting...")
 
 @app.get("/")
 def root():
@@ -46,7 +46,7 @@ def predict(data: PredictionInput):
     with initialize(config_path="../../configs", version_base="1.3"):
         cfg = compose(config_name="cluster")
 
-    train_cfg = build_train_config(cfg)
+    train_cfg = train.build_train_config(cfg)
 
     csv_path = "data/processed/combined.csv"
     df = load_preprocessed_data(csv_path, required_feats)
@@ -58,7 +58,7 @@ def predict(data: PredictionInput):
     # Append to dataset
     df_with_new = pd.concat([df, new_row], ignore_index=True)
 
-    df_out, kmeans, X_scaled = cluster_train.train(df_with_new, train_cfg.n_clusters, train_cfg.seed)
+    df_out, kmeans, X_scaled = train.train(df_with_new, train_cfg.n_clusters, train_cfg.seed)
 
     # Get user's cluster
     user_cluster = df_out.iloc[-1]["cluster"]
