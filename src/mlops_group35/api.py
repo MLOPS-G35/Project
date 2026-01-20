@@ -24,6 +24,7 @@ app = FastAPI()
 
 print("Api is starting...")
 
+
 @app.get("/")
 def root():
     """Health check."""
