@@ -2,9 +2,9 @@ import streamlit as st
 import requests
 
 # Backend URL
-#URL = "http://127.0.0.1:8000"
+# URL = "http://127.0.0.1:8000"
 URL = "http://35.209.123.130:8000"
-#URL = "http://host.docker.internal:8000"
+# URL = "http://host.docker.internal:8000"
 
 # Page config
 st.set_page_config(page_title="Neurodiversity Classifier", layout="centered")
