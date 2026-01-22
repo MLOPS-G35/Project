@@ -61,12 +61,8 @@ def psi_table(
             {
                 "feature": col,
                 "psi": psi(df_baseline[col], df_current[col], n_bins=n_bins),
-                "baseline_mean": float(
-                    pd.to_numeric(df_baseline[col], errors="coerce").mean()
-                ),
-                "current_mean": float(
-                    pd.to_numeric(df_current[col], errors="coerce").mean()
-                ),
+                "baseline_mean": float(pd.to_numeric(df_baseline[col], errors="coerce").mean()),
+                "current_mean": float(pd.to_numeric(df_current[col], errors="coerce").mean()),
             }
         )
     out = pd.DataFrame(rows).sort_values("psi", ascending=False, na_position="last")
@@ -79,6 +75,4 @@ def detect_drift(
     min_features: int = 2,
 ) -> DriftResult:
     n = int((psi_df["psi"] > threshold).sum())
-    return DriftResult(
-        drift_detected=(n >= min_features), n_features_drifted=n, threshold=threshold
-    )
+    return DriftResult(drift_detected=(n >= min_features), n_features_drifted=n, threshold=threshold)
