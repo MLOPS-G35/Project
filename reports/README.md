@@ -450,7 +450,12 @@ We did not require GPU acceleration, so no GPUs were attached to the VM.
 >
 > Answer:
 
---- question 20 fill here ---
+Note: We did not use Google Artifact Registry, instead we used GitHub Container Registry (GHCR) to store your Docker 
+images.
+
+![Screenshot](figures/Q20-01.png)
+
+Please also check out our old GHCR: https://github.com/EmilianoCarrara?tab=packages&repo_name=MLOps_group35
 
 ### Question 21
 
@@ -459,7 +464,10 @@ We did not require GPU acceleration, so no GPUs were attached to the VM.
 >
 > Answer:
 
---- question 21 fill here ---
+![Screenshot](figures/Q21-01.png)
+
+![Screenshot](figures/Q21-02.png)
+
 
 ### Question 22
 
@@ -474,8 +482,10 @@ We did not require GPU acceleration, so no GPUs were attached to the VM.
 >
 > Answer:
 
---- question 22 fill here ---
-
+We managed to train our model in the cloud using the Google Compute Engine. We did this by first creating a 
+Docker image that included all the necessary dependencies, files, and data. We then deployed the image to a virtual 
+machine and ran the training process there. It was not required use Compute Engine to train as our dataset was not 
+large, hence, no extra power was needed.
 ## Deployment
 
 ### Question 23
