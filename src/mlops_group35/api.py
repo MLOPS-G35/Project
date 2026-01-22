@@ -3,7 +3,9 @@ from http import HTTPStatus
 from hydra import initialize, compose
 import pandas as pd
 from pydantic import BaseModel
-# from mlops_group35.metrics import update_system_metrics
+from mlops_group35.metrics import update_system_metrics
+from pathlib import Path
+from mlops_group35.drift_runtime import run_drift_report
 
 from mlops_group35 import train
 from mlops_group35.data import load_preprocessed_data
@@ -20,6 +22,9 @@ class PredictionInput(BaseModel):
     inattentive: float
     hyper_impulsive: float
 
+
+DATA_CSV = Path("data/processed/combined.csv")
+REQUESTS_JSONL = Path("logs/requests.jsonl")
 
 app = FastAPI()
 
@@ -70,21 +75,21 @@ def read_item(item_id: int):
 #     return {"Group": int(user_cluster)}
 
 
-# @app.get("/drift")
-# def drift(n: int = 200, psi_threshold: float = 0.2):
-#     # --- ADDED: update system metrics on request ---
-#     update_system_metrics()
-#
-#     required_feats = list(PredictionInput.model_fields.keys())
-#
-#     report = run_drift_report(
-#         baseline_csv=DATA_CSV,
-#         requests_jsonl=REQUESTS_JSONL,
-#         features=required_feats,
-#         n=n,
-#         psi_threshold=psi_threshold,
-#     )
-#     return report
+@app.get("/drift")
+def drift(n: int = 200, psi_threshold: float = 0.2):
+    # --- ADDED: update system metrics on request ---
+    update_system_metrics()
+
+    required_feats = list(PredictionInput.model_fields.keys())
+
+    report = run_drift_report(
+        baseline_csv=DATA_CSV,
+        requests_jsonl=REQUESTS_JSONL,
+        features=required_feats,
+        n=n,
+        psi_threshold=psi_threshold,
+    )
+    return report
 
 
 @app.post("/predict")
@@ -115,13 +120,21 @@ def predict(data: PredictionInput, n_clusters: int):
     user_cluster = int(df_out.iloc[-1]["cluster"])
 
     # Compute cluster profiles (means)
-    cluster_profiles = df_out.groupby("cluster")[list(required_feats)].mean().round(2).to_dict(orient="index")
+    cluster_profiles = (
+        df_out.groupby("cluster")[list(required_feats)]
+        .mean()
+        .round(2)
+        .to_dict(orient="index")
+    )
 
     user_values = new_row.iloc[0].to_dict()
     cluster_mean = cluster_profiles[user_cluster]
 
     # Compare user to cluster mean
-    differences = {feat: round(user_values[feat] - cluster_mean[feat], 2) for feat in required_feats}
+    differences = {
+        feat: round(user_values[feat] - cluster_mean[feat], 2)
+        for feat in required_feats
+    }
 
     # Simple interpretation logic
     interpretation = []

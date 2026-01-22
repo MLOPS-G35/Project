@@ -46,7 +46,9 @@ def run_drift_report(
 
     current = current[features]
 
-    psi_df = psi_table(baseline, current)  # <-- deve tornare columns: feature, psi (o simile)
+    psi_df = psi_table(
+        baseline, current
+    )  # <-- deve tornare columns: feature, psi (o simile)
     # Adatta i nomi colonne se necessari:
     psi_col = "psi" if "psi" in psi_df.columns else psi_df.columns[-1]
     feat_col = "feature" if "feature" in psi_df.columns else psi_df.columns[0]
@@ -59,5 +61,7 @@ def run_drift_report(
         "n_samples_current": int(len(current)),
         "psi_threshold": psi_threshold,
         "n_features_drifted": int(len(drifted)),
-        "top_features": psi_df_sorted.head(5)[[feat_col, psi_col]].to_dict(orient="records"),
+        "top_features": psi_df_sorted.head(5)[[feat_col, psi_col]].to_dict(
+            orient="records"
+        ),
     }
