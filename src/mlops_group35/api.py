@@ -3,6 +3,7 @@ from http import HTTPStatus
 from hydra import initialize, compose
 import pandas as pd
 from pydantic import BaseModel
+from mlops_group35.metrics import update_system_metrics
 
 from mlops_group35 import train
 from mlops_group35.data import load_preprocessed_data
@@ -68,6 +69,22 @@ def read_item(item_id: int):
 #     # TODO ATM it returns the cluster number, but it should return some interpretations
 #     return {"Group": int(user_cluster)}
 
+
+@app.get("/drift")
+def drift(n: int = 200, psi_threshold: float = 0.2):
+    # --- ADDED: update system metrics on request ---
+    update_system_metrics()
+
+    required_feats = list(PredictionInput.model_fields.keys())
+
+    report = run_drift_report(
+        baseline_csv=DATA_CSV,
+        requests_jsonl=REQUESTS_JSONL,
+        features=required_feats,
+        n=n,
+        psi_threshold=psi_threshold,
+    )
+    return report
 
 @app.post("/predict")
 def predict(data: PredictionInput, n_clusters: int):
