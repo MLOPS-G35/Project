@@ -1,0 +1,8 @@
+{
+  "silhouette": 0.18536996027078292,
+  "inertia": 3039.054427015769,
+  "n_clusters": 5,
+  "n_samples": 606,
+  "n_features": 10,
+  "csv_path": "data/processed/combined.csv"
+}
