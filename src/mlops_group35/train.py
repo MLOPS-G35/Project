@@ -80,7 +80,9 @@ def generate_and_save_metrics(cfg, feats, kmeans, x_scaled, clusters, ids, run):
 
     # ---- Save outputs ----
     assignments_path = "reports/cluster_assignments.csv"
-    pd.DataFrame({cfg.id_col: ids.to_numpy(), "cluster": clusters}).to_csv(assignments_path, index=False)
+    pd.DataFrame({cfg.id_col: ids.to_numpy(), "cluster": clusters}).to_csv(
+        assignments_path, index=False
+    )
 
     logger.info("Saved cluster assignments to %s", assignments_path)
 
@@ -130,7 +132,15 @@ def train(df, n_clusters, seed):
 def _process_data(df):
     # TODO apply one-hot-encode for gender
     df2 = df.drop(
-        columns=["scandir_id", "site", "full2_iq", "qc_rest_3", "qc_rest_4", "qc_anatomical_2", "secondary_dx"],
+        columns=[
+            "scandir_id",
+            "site",
+            "full2_iq",
+            "qc_rest_3",
+            "qc_rest_4",
+            "qc_anatomical_2",
+            "secondary_dx",
+        ],
         errors="ignore",
     )
 
@@ -144,12 +154,16 @@ def _process_data(df):
     X_imputed = pd.DataFrame(imputer.fit_transform(X), columns=X.columns, index=X.index)
 
     scaler = StandardScaler()
-    X_scaled = pd.DataFrame(scaler.fit_transform(X_imputed), columns=X.columns, index=X.index)
+    X_scaled = pd.DataFrame(
+        scaler.fit_transform(X_imputed), columns=X.columns, index=X.index
+    )
 
     return X_scaled
 
 
-def run_training_with_optional_profiling(cfg: TrainConfig, run: wandb.sdk.wandb_run.Run | None) -> None:
+def run_training_with_optional_profiling(
+    cfg: TrainConfig, run: wandb.sdk.wandb_run.Run | None
+) -> None:
     # ---- Load data ----
     df = load_preprocessed_data(cfg.csv_path, cfg.feature_cols)
     logger.info(
