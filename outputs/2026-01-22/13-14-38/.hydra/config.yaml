@@ -17,5 +17,5 @@ feature_cols:
 n_clusters: 5
 use_wandb: true
 wandb_project: mlops_group35
-wandb_mode: offline
+wandb_mode: online
 wandb_run_name: null
