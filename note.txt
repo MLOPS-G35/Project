@@ -29,8 +29,11 @@ docker run -d \
   -p 8000:8000 \
   ghcr.io/emilianocarrara/mlops_group35-api
 
+docker build frontend:
+docker build -t frontend -f dockerfiles/frontend.dockerfile .
+docker run -p 8501:8501 frontend
+Will be running at: http://localhost:8501
+
 
 Frontend:
 uv run streamlit run frontend/app.py
-
-Deleteme later
