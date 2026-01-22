@@ -146,7 +146,7 @@ will check the repositories and the code to verify your answers.
 > *We used the third-party framework ... in our project. We used functionality ... and functionality ... from the*
 > *package to do ... and ... in our project*.
 >
-> Answer:
+> Answer: We did not use any third-party frameworks/packages that were not cover in the course. 
 
 --- question 3 fill here ---
 
@@ -166,9 +166,17 @@ will check the repositories and the code to verify your answers.
 > *We used ... for managing our dependencies. The list of dependencies was auto-generated using ... . To get a*
 > *complete copy of our development environment, one would have to run the following commands*
 >
-> Answer:
+> Answer: 
 
---- question 4 fill here ---
+We used uv for managing our Python dependencies.
+The list of dependencies was auto-generated and locked using pyproject.toml and uv.lock.
+To get a complete copy of our development environment, a new team member would:
+```bash
+git clone https://github.com/MLOPS-G35/Project.git
+cd project
+uv sync
+```
+This installs the exact same dependency versions used in the project, ensuring a consistent environment across all machines.
 
 ### Question 5
 
@@ -199,7 +207,9 @@ will check the repositories and the code to verify your answers.
 >
 > Answer:
 
---- question 6 fill here ---
+We used a linting tool to enforce basic code quality rules and catch common errors. In addition, we set up GitHub
+hooks to prevent commits that did not meet our project’s standards. For documentation, we used MkDocs to create 
+clear and structured project documentation.
 
 ## Version control
 
@@ -218,7 +228,8 @@ will check the repositories and the code to verify your answers.
 >
 > Answer:
 
---- question 7 fill here ---
+In total, we have implemented 8 tests. Primarily we are testing the train process, data process, and API. These are the
+most critical parts of our system.
 
 ### Question 8
 
@@ -232,8 +243,10 @@ will check the repositories and the code to verify your answers.
 > *code and even if we were then...*
 >
 > Answer:
+The total code coverage of the code is around 44%. 
+100% code coverage means that in the tests, all of our code executed. However, it does not say anything about
+whether they are tested correctly. Hence, we will not trust that it's error, not even if all code are tested correctly.
 
---- question 8 fill here ---
 
 ### Question 9
 
@@ -248,7 +261,10 @@ will check the repositories and the code to verify your answers.
 >
 > Answer:
 
---- question 9 fill here ---
+We created one branch for each task in our project. Once a task was completed, it was merged into the main branch.
+Occasionally, we created pull requests, but since we were only two team members and both had solid experience 
+in software development, we agreed that formal code reviews were not always necessary. Therefore, we often merged 
+our changes directly into main without using pull requests.
 
 ### Question 10
 
@@ -346,7 +362,15 @@ will check the repositories and the code to verify your answers.
 >
 > Answer:
 
---- question 15 fill here ---
+For our project, we developed several Docker images: one for the API, one for the frontend, and one for training.
+We used docker images for CI to the VM-whenever changes occur in branch main, we build new images and deploy them to vm 
+automatically by using Github actions.
+
+To run the API Docker image:\
+docker run -d --restart unless-stopped -p 8000:8000 ghcr.io/mlops-g35/project-api
+
+Link to the Docker images and files:\
+https://github.com/orgs/MLOPS-G35/packages?repo_name=Project
 
 ### Question 16
 
@@ -361,7 +385,11 @@ will check the repositories and the code to verify your answers.
 >
 > Answer:
 
---- question 16 fill here ---
+Debugging method was dependent on group member. Some used Intellij Debugger and others used VS Code.
+
+Even though our dataset is not very large and does not take much time to run the application, we still ran the profiling tool.
+The results showed that there was room for improvement.
+
 
 ## Working in the cloud
 
@@ -378,7 +406,11 @@ will check the repositories and the code to verify your answers.
 >
 > Answer:
 
---- question 17 fill here ---
+We used Google Compute Engine to train, and host and run our backend API and frontend application.
+
+We used Cloud Networking (including firewall rules and external IPs) to expose the applications to the internet 
+and allow users to access the system.
+
 
 ### Question 18
 
@@ -393,7 +425,14 @@ will check the repositories and the code to verify your answers.
 >
 > Answer:
 
---- question 18 fill here ---
+We used Google Cloud Compute Engine as the backbone of our infrastructure to deploy and run our application in a 
+scalable and reliable environment. Compute Engine allowed us to create virtual machine (VM) instances with the exact 
+specifications needed for our workload, while benefiting from Google’s global infrastructure and security features.
+For our project, we used an e2-small VM instance, which provides 2 vCPUs and 2 GB of memory. The instance ran on 
+an Intel Broadwell CPU platform with an x86/64 architecture. This machine type was suitable for our lightweight 
+application requirements, offering a good balance between performance and cost efficiency.
+We did not require GPU acceleration, so no GPUs were attached to the VM.
+
 
 ### Question 19
 

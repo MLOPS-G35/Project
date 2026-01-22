@@ -24,10 +24,7 @@ uv run ruff check --fix .
 uv run ruff format .
 
 docker:
-docker run -d \
-  --restart unless-stopped \
-  -p 8000:8000 \
-  ghcr.io/emilianocarrara/mlops_group35-api
+docker run -d --restart unless-stopped -p 8000:8000 ghcr.io/mlops-g35/project-api
 
 docker build frontend:
 docker build -t frontend -f dockerfiles/frontend.dockerfile .
