@@ -113,6 +113,7 @@ jobs:
               -p 8000:8000 \
               --restart always \
               $IMAGE
+            docker image prune -af
 
 
 
@@ -146,6 +147,7 @@ jobs:
               -p 8501:8501 \
               --restart always \
               $IMAGE
+            docker image prune -af
 
 
 
