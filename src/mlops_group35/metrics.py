@@ -21,7 +21,6 @@ def update_system_metrics() -> None:
     try:
         PROCESS_OPEN_FDS.set(process.num_fds())
     except Exception:
-
         PROCESS_OPEN_FDS.set(0)
     if not _last_cpu_call:
         process.cpu_percent(interval=None)
