@@ -6,6 +6,9 @@ Run data.py
 Test:
 uv run pytest
 uv run pytest -s
+uv run pytest -v --ignore=tests/integration
+uv run pytest -v tests/integration
+uv run pytest -v --ignore=tests/integration --ignore=tests/performance
 
 API test:
 uv run pytest tests/integrationtests/test_apis.py

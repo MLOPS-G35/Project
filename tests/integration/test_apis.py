@@ -2,8 +2,8 @@
 # client = TestClient(app)
 import requests
 
-# BASE_URL = "http://136.113.102.90:8000"
-BASE_URL = "http://localhost:8000"
+BASE_URL = "http://35.209.123.130:8000"
+#BASE_URL = "http://localhost:8000"
 
 
 def test_read_root():

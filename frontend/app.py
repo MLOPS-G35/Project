@@ -2,7 +2,7 @@ import streamlit as st
 import requests
 
 # Backend URL
-URL = "http://127.0.0.1:5000"
+URL = "http://127.0.0.1:8000"
 
 # Page config
 st.set_page_config(page_title="Neurodiversity Classifier", layout="centered")
