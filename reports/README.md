@@ -184,7 +184,14 @@ will check the repositories and the code to verify your answers.
 >
 > Answer:
 
---- question 5 fill here ---
+The project was initialized using the official "cookiecutter" template provided.
+The main source code is in src/mlops_group35/, and it contains data management (data.py), model logic (model.py), training (train.py), API deployment (api.py), and drift detection (drift.py, drift_runtime.py, drift_check.py).
+
+We populated the data/ folder with the raw/ and processed/ subdirectories, where the dataset is stored and we generated a combined preprocessed CSV file. The tests/ directory contains unit and integration tests. dockerfiles/ includes separate Dockerfiles for training and API inference, following best practices. 
+The outputs (like profiling results and drift reports) are stored in the reports/ folder. The pictures for the exam report are stored in reports/figures/.
+
+We deviated from the template by not introducing DVC-related folders or tooling. Given the small size of the dataset, we chose not to set up a dedicated data versioning system.
+Additionally, we added scripts and report files for drift detection, which were not part of the original template but were needed to support both offline analysis and runtime checks.
 
 ### Question 6
 
@@ -233,7 +240,6 @@ will check the repositories and the code to verify your answers.
 >
 > Answer:
 
---- question 8 fill here ---
 
 ### Question 9
 
@@ -263,7 +269,8 @@ will check the repositories and the code to verify your answers.
 >
 > Answer:
 
---- question 10 fill here ---
+No, we didn't use DVC because the dataset is too small and static, so it's already available in preprocessed form. Therefore, it's not necessary to introduce a data versioning system into the project. Data management remained simple.
+DVC would have been useful if the data had changed over time, was large in size, or was generated with complex pipelines. In those cases, we could have versioned the datasets along with the code without having to save them in Git, thus reproducing experiments by associating a specific version of the code with a specific version of the data. Furthermore, DVC helps facilitate data tracking, compare different versions of the dataset, and integrate with remote storage.
 
 ### Question 11
 
@@ -280,7 +287,19 @@ will check the repositories and the code to verify your answers.
 >
 > Answer:
 
---- question 11 fill here ---
+We used GitHub Actions to set up continuous integration for our project. CI runs automatically with every push request, and pull verifies that the code works correctly and follows the same style throughout the project.
+All workflows are stored in the .github/workflows/ directory.
+The CI pipeline runs unit tests using pytest. These tests focus on the most important parts of the code (the data processing logic, the training script, and the core API features).
+We also measure code coverage with pytest-cov.
+In addition to tests, CI includes linting and formatting checks.
+We use Ruff to detect common code issues and Black to ensure consistent code formatting.
+CI uses a matrix setup to run tests on multiple operating systems, including Linux, Windows, and macOS.
+All jobs use Python 3.11, which matches our local development environment.
+We've also enabled dependency caching for packages managed with uv, reducing the execution time of repeated CI runs.
+
+For verifiability:
+.github/workflows/ directory in the repository
+Successful runs visible in the GitHub Actions tab
 
 ## Running code and tracking experiments
 
@@ -299,7 +318,13 @@ will check the repositories and the code to verify your answers.
 >
 > Answer:
 
---- question 12 fill here ---
+We configured our experiments using Hydra and YAML configuration files. All experiment settings are defined in configs/cluster.yaml so that hyperparameters can be modified without modifying the source code.
+Experiments are run via a command line interface, and parameters can be overridden directly from the command line.
+
+For example:
+"uv run python -m mlops_group35.train n_clusters=3 profile=true"
+
+This configuration simplifies execution and ensures reproducibility when comparing different configurations.
 
 ### Question 13
 
@@ -314,7 +339,25 @@ will check the repositories and the code to verify your answers.
 >
 > Answer:
 
---- question 13 fill here ---
+We ensured the reproducibility of our experiments primarily through:
+- configuration management
+- experiment logging and tracking.
+
+All experiment parameters are defined using Hydra configuration files, so each run is fully described by a specific configuration state.
+
+Hydra automatically records the parameter configuration used for each experiment.
+
+We also use Weights & Biases (W&B). During training, we record important metrics such as:
+- inertia (KMeans)
+- silhouette score
+- number of clusters
+- runtime/profiling information.
+These logs are stored along with the configuration and metadata for each run.
+This simplifies comparisons between different runs and parameters.
+
+The code is also version-controlled via Git, so each experiment can be associated with a specific source code commit.
+
+To reproduce an experiment, you can check out the same Git commit, use the same configuration file (or the same Hydra overrides), and rerun the training command.
 
 ### Question 14
 
@@ -331,7 +374,27 @@ will check the repositories and the code to verify your answers.
 >
 > Answer:
 
---- question 14 fill here ---
+We used Weights & Biases (W&B) to monitor and visualize our experiments during model training. The following screenshots show an overview of multiple training runs, as well as detailed visualizations of individual experiment metrics. This allowed us to compare different configurations and better understand the behavior of our KMeans clustering model.
+
+![Screenshot](figures/Q14-01.png)
+
+The first image shows an overview of all the W&B project runs.
+Each row corresponds to a different training run, executed with different configurations.
+From this view, we can easily see:
+- the status of each run
+- the execution time
+- the execution date of the experiments
+This overview helps us compare runs and verify that multiple experiments have been run in a structured and consistent manner.
+
+![Screenshot](figures/Q14-02.png)
+
+The second image shows a detailed overview of a single run.
+Here, W&B automatically records important metadata:
+- the executed command
+- the operating system
+- the Python version
+- the Git repository and commit hash
+This information is essential for reproducibility, as it allows us to know the exact version of the code and the execution environment for each experiment.
 
 ### Question 15
 
@@ -402,7 +465,9 @@ will check the repositories and the code to verify your answers.
 >
 > Answer:
 
---- question 19 fill here ---
+We did not make use of a GCP Cloud Storage bucket in this project. The dataset used is small and static, and it is stored directly in the GitHub repository as CSV files. So, we did not set up a separate cloud-based data storage solution.
+
+As the project does not rely on large datasets or frequent data updates, introducing a GCP bucket would have added unnecessary complexity without clear benefits in this specific case.
 
 ### Question 20
 
@@ -452,7 +517,21 @@ will check the repositories and the code to verify your answers.
 >
 > Answer:
 
---- question 23 fill here ---
+Yes, the API is implemented using FastAPI in the file src/mlops_group35/api.py and is used to serve the KMeans clustering model.
+
+When the API starts, it first loads the trained model and the required preprocessing steps into memory.
+This allows the API to make predictions quickly without having to retrain the model.
+We have implemented a /health endpoint to verify that the service is functioning correctly.
+The main endpoint, /predict, receives input data in JSON format and returns the predicted cluster for the input (along with a brief explanation of the result).
+
+Additionally, we have implemented a /drift endpoint to perform a run-time drift check and report if the input data differs from the training data distribution, allowing us to monitor the model after deployment.
+
+The API also includes basic request and response logging.
+We tested the API locally using Uvicorn and verified that all endpoints responded correctly.
+
+Verifiability
+src/mlops_group35/api.py
+Endpoints: /health, /predict, /drift
 
 ### Question 24
 
@@ -468,7 +547,21 @@ will check the repositories and the code to verify your answers.
 >
 > Answer:
 
---- question 24 fill here ---
+Yes, we were able to deploy our API locally and on the cloud.
+For local deployment, we ran the FastAPI application using Uvicorn in our development environment.
+After starting the server, the API can be called locally via a browser or tools like curl.
+
+In addition to local deployment, we containerized the API using Docker and deployed it to a GCP Compute Engine virtual machine.
+The Docker image was built locally and then run on the VM using Docker.
+This allowed us to serve the API in a cloud environment and access it via the VM's external IP address.
+
+Local API command:
+uv run uvicorn mlops_group35.api:app --host 0.0.0.0 --port 8000
+
+Health check endpoint:
+curl http://localhost:8000/health
+
+Dockerfile for the API in dockerfiles/api.dockerfile
 
 ### Question 25
 
@@ -483,7 +576,19 @@ will check the repositories and the code to verify your answers.
 >
 > Answer:
 
---- question 25 fill here ---
+We ran basic unit and integration tests of our API using FastAPI's pytest and TestClient.
+The tests are located in tests/integration/test_apis.py and verify that key API endpoints respond correctly.
+
+In particular, we verified
+- that the /health endpoint returns a correct response
+- that the /predict endpoint accepts valid JSON input and produces valid prediction output.
+These tests were run in the local development environment but are not included in the CI pipeline.
+
+We did not run load tests of the API. Given the limited scope of the project, we focused on correctness rather than performance under high load.
+
+Testability:
+tests/integration/test_apis.py
+Local execution: uv run pytest tests/integration/
 
 ### Question 26
 
@@ -498,7 +603,22 @@ will check the repositories and the code to verify your answers.
 >
 > Answer:
 
---- question 26 fill here ---
+We've implemented basic monitoring support, but we haven't configured a full monitoring system for the API.
+
+In the source code, we've added a simple metrics module that can collect basic system information while the API is running. This shows how monitoring could be integrated into the application.
+However, we haven't exposed these metrics via a /metrics endpoint, and we haven't connected the service to external monitoring tools like Prometheus or GCP Cloud Monitoring.
+
+Monitoring helps track system behavior over time by observing:
+- response times
+- error rates
+- unusual patterns in incoming requests
+It can also help detect problems early, such as performance decline or unexpected behavior.
+
+If this project were to be expanded, we would add a collection of appropriate metrics and dashboards and connect them to an alerting system.
+
+Verifiability:
+src/mlops_group35/metrics.py
+Tracking of hooks referenced in the API code
 
 ## Overall discussion of project
 
@@ -517,7 +637,11 @@ will check the repositories and the code to verify your answers.
 >
 > Answer:
 
---- question 27 fill here ---
+During the project, we used only a small amount of GCP credits. The main cloud resource used was Compute Engine, where a virtual machine was created to run a Dockerized version of the API. Because the VM was only used for a short time and with a basic configuration, overall credit consumption was low.
+
+Compute Engine was the most expensive service we used, primarily due to the cost of running a VM instance, even when idle.
+
+Cloud services make it easier to deploy applications, test them in realistic environments, and share the results with others. At the same time, we learned that cloud resources must be carefully managed, as costs can quickly escalate if services are left running. For this project, the cloud proved useful for learning deployment concepts, while local development remained more efficient for most tasks.
 
 ### Question 28
 
