@@ -1,8 +1,11 @@
 # MLOps_group35
 
-Project synopsis - Group - 35
+Project synopsis - Group - 35 
 
-Title: Identifying neurodiversity
+Frontend URL: http://35.209.123.130:8501 \
+API URL: http://35.209.123.130:8000/docs 
+
+### Title: Identifying neurodiversity
 
 ## Motivation and Goal
 
