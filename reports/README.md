@@ -706,8 +706,12 @@ Cloud services make it easier to deploy applications, test them in realistic env
 >
 > Answer:
 
---- question 28 fill here ---
+We did implement a simple frontend for our API and deployed to the same VM (for simplicity). However, we are not sure
+if it counts as an extra as it's mentioned in the tasks.
 
+Frontend URL: http://35.209.123.130:8501 
+
+TODO: drift detection
 ### Question 29
 
 > **Include a figure that describes the overall architecture of your system and what services that you make use of.**
@@ -755,4 +759,5 @@ Cloud services make it easier to deploy applications, test them in realistic env
 > *We have used ChatGPT to help debug our code. Additionally, we used GitHub Copilot to help write some of our code.*
 > Answer:
 
---- question 31 fill here ---
+We both equally contributed to the project. \
+AI tools were used for grammar correction and coding.
