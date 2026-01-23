@@ -146,8 +146,12 @@ s250828, s186517
 > *We used the third-party framework ... in our project. We used functionality ... and functionality ... from the*
 > *package to do ... and ... in our project*.
 >
-> Answer: We did not use any third-party frameworks/packages that were not cover in the course. 
+> Answer: 
 
+Almost all third-party frameworks/packages/library that we used were covered in the course. The only library that was not
+covered is psutil. It is used to access system and process-level runtime information, such as CPU usage, memory 
+consumption, number of threads, and open file descriptors. It is commonly used for monitoring, debugging resource 
+usage, and exporting custom metrics (e.g. to Prometheus) in production systems.
 
 ## Coding environment
 
@@ -167,9 +171,9 @@ s250828, s186517
 >
 > Answer: 
 
-We used uv for managing our Python dependencies.
+We used uv for managing our project dependencies.
 The list of dependencies was auto-generated and locked using pyproject.toml and uv.lock.
-To get a complete copy of our development environment, a new team member would:
+To get a complete copy of our development environment, a new team member would need to do the following:
 ```bash
 git clone https://github.com/MLOPS-G35/Project.git
 cd project
