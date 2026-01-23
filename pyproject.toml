@@ -34,6 +34,7 @@ dependencies = [
     "httpx>=0.28.1",
     "prometheus-client>=0.24.1",
     "pytest-cov>=6.3.0",
+    "locust>=2.43.1",
 ]
 
 [dependency-groups]
