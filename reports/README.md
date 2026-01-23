@@ -738,7 +738,21 @@ TODO: drift detection
 >
 > Answer:
 
---- question 29 fill here ---
+![Screenshot](figures/Q29-01.png)
+
+The figure shows the overall architecture of our MLOps pipeline.
+The process begins with local development, where we train the model using Python and Hydra to manage the experiment setup.
+We use Weights & Biases (W&B) to monitor experiments, record metrics, and run sweeps to compare different configurations.
+
+After development, the code is pushed to a GitHub repository. Each commit triggers GitHub Actions, which serves as a continuous integration system.
+In CI, we run automated tests and checks and build Docker images for the application.
+In CI, we run automatic tests and checks and build Docker images.
+The images are stored in a container registry and later used to run the application on a Google Compute Engine virtual machine.
+
+On the virtual machine, we run a FastAPI inference API that provides predictions to users.
+Users can access the system by sending requests directly to the API or using a frontend application that communicates with the API.
+
+The API also connects to drift detection, which checks whether the input data changes compared to the training data, and monitoring, which collects basic runtime information.
 
 ### Question 30
 
