@@ -637,14 +637,18 @@ Dockerfile for the API in dockerfiles/api.dockerfile
 > Answer:
 
 We ran basic unit and integration tests of our API using FastAPI's pytest and TestClient.
-The tests are located in tests/integration/test_apis.py and verify that key API endpoints respond correctly.
+The tests are located in tests folder and integretion test are located in sub folder integration which tests API 
+endpoints respond correctly.
 
 In particular, we verified
 - that the /health endpoint returns a correct response
 - that the /predict endpoint accepts valid JSON input and produces valid prediction output.
 These tests were run in the local development environment but are not included in the CI pipeline.
 
-We did not run load tests of the API. Given the limited scope of the project, we focused on correctness rather than performance under high load.
+We did run load tests one the API, however, since for every call to the endpoint "predict"(should have called classify)
+classifies data points including the new one sent by the frontend, it takes a bit time respond. Hence, load test shows a
+large number of queries fail. We could solve this by creating one thread for each query, but due to time constrains and lack of 
+resources in VM, we decided not to solve it.
 
 Testability:
 tests/integration/test_apis.py
