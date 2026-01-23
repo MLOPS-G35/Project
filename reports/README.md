@@ -123,7 +123,7 @@ will check the repositories and the code to verify your answers.
 >
 > Answer:
 
---- question 1 fill here ---
+Group: 35
 
 ### Question 2
 > **Enter the study number for each member in the group**
@@ -134,7 +134,7 @@ will check the repositories and the code to verify your answers.
 >
 > Answer:
 
---- question 2 fill here ---
+s250828, s186517
 
 ### Question 3
 > **Did you end up using any open-source frameworks/packages not covered in the course during your project? If so**
@@ -215,7 +215,9 @@ Additionally, we added scripts and report files for drift detection, which were 
 
 We used a linting tool to enforce basic code quality rules and catch common errors. In addition, we set up GitHub
 hooks to prevent commits that did not meet our project’s standards. For documentation, we used MkDocs to create 
-clear and structured project documentation.
+clear and structured project documentation. These concepts matter because when you have a large project, which is the case
+in almost every industry, involve a large number of contributors with different backgrounds and coding styles. 
+Therefore, having standard rules ensures that everyone follows the same guidelines to avoid the messes.
 
 ## Version control
 
@@ -234,8 +236,9 @@ clear and structured project documentation.
 >
 > Answer:
 
-In total, we have implemented 8 tests. Primarily we are testing the train process, data process, and API. These are the
-most critical parts of our system.
+In total, we have implemented 8 tests. These tests primarily focus on the training process, data processing 
+pipeline, and the API, as these components are the most critical parts of our system. By testing these areas, we aim
+to ensure the correctness, stability, and reliability of the overall application.
 
 ### Question 8
 
@@ -249,10 +252,12 @@ most critical parts of our system.
 > *code and even if we were then...*
 >
 > Answer:
-The total code coverage of the code is around 44%. 
-100% code coverage means that in the tests, all of our code executed. However, it does not say anything about
-whether they are tested correctly. Hence, we will not trust that it's error, not even if all code are tested correctly.
 
+The total code coverage of the code is around 44%, which gives a general indication of how much of the system is 
+exercised by our tests. Error free system does not exist. 100% code coverage means that in the tests, all of our code 
+executed. However, it does not say anything about whether they are tested correctly. Hence, we will not trust that 
+it's error-free with 100% code coverage, not even if all code are tested correctly. It might minimizes the number 
+of errors, but it's never error free.
 
 ### Question 9
 
@@ -448,10 +453,12 @@ https://github.com/orgs/MLOPS-G35/packages?repo_name=Project
 >
 > Answer:
 
-Debugging method was dependent on group member. Some used Intellij Debugger and others used VS Code.
-
-Even though our dataset is not very large and does not take much time to run the application, we still ran the profiling tool.
-The results showed that there was room for improvement.
+Debugging methods were dependent on the group member. Some members used the IntelliJ debugger, while others relied 
+on the VS Code debugging tools to identify and fix issues when running experiments. In addition, logging was used to 
+trace errors and better understand unexpected behavior during execution. Even though our dataset is not very large and
+the application does not take much time to run, we still performed a profiling run on the main code. The results 
+indicated that there was room for improvement, particularly in terms of efficiency, and the code was not yet 
+perfectly optimized.
 
 
 ## Working in the cloud
@@ -547,10 +554,14 @@ Please also check out our old GHCR: https://github.com/EmilianoCarrara?tab=packa
 >
 > Answer:
 
-We managed to train our model in the cloud using the Google Compute Engine. We did this by first creating a 
-Docker image that included all the necessary dependencies, files, and data. We then deployed the image to a virtual 
-machine and ran the training process there. It was not required to use Compute Engine to train as our dataset was not 
-large, hence, no extra power was needed.
+We managed to train our model in the cloud using the Google Compute Engine.  We did this by first creating a Docker
+image that included all the necessary dependencies, files, and data. This helped ensure consistency between local and
+cloud executions. We then deployed the image to a virtual machine and ran the training(classifying) process there. 
+The setup also enabled us to test remote execution and resource management. It was not required to use Compute 
+Engine to train as our dataset was not large, hence, no extra power was needed. However, using the cloud was still 
+valuable for validation and experimentation purposes.
+
+
 ## Deployment
 
 ### Question 23
