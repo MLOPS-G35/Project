@@ -1,0 +1,38 @@
+{
+  "drift_detected": true,
+  "n_features_drifted": 2,
+  "threshold": 0.2,
+  "top_features": [
+    {
+      "feature": "age",
+      "psi": 11.1996993490764,
+      "baseline_mean": 11.940297029702974,
+      "current_mean": 21.94029702970297
+    },
+    {
+      "feature": "adhd_index",
+      "psi": 1.1164070766324867,
+      "baseline_mean": 53.2277628032345,
+      "current_mean": 66.53470350404312
+    },
+    {
+      "feature": "inattentive",
+      "psi": 0.003079633372625416,
+      "baseline_mean": 51.50666666666667,
+      "current_mean": 51.785714285714285
+    },
+    {
+      "feature": "gender",
+      "psi": 0.0,
+      "baseline_mean": 0.5669421487603306,
+      "current_mean": 0.5669421487603306
+    },
+    {
+      "feature": "handedness",
+      "psi": 0.0,
+      "baseline_mean": 0.84220367278798,
+      "current_mean": 0.84220367278798
+    }
+  ],
+  "notes": "Drift was simulated for demonstration (age shift, ADHD scale, missingness)."
+}
