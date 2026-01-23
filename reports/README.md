@@ -549,7 +549,7 @@ Please also check out our old GHCR: https://github.com/EmilianoCarrara?tab=packa
 
 We managed to train our model in the cloud using the Google Compute Engine. We did this by first creating a 
 Docker image that included all the necessary dependencies, files, and data. We then deployed the image to a virtual 
-machine and ran the training process there. It was not required use Compute Engine to train as our dataset was not 
+machine and ran the training process there. It was not required to use Compute Engine to train as our dataset was not 
 large, hence, no extra power was needed.
 ## Deployment
 
@@ -741,7 +741,20 @@ TODO: drift detection
 >
 > Answer:
 
---- question 30 fill here ---
+The main struggles of the project were related to the Continuous Integration (CI) setup, where we spent the majority
+of our time. In particular, configuring Google Cloud services proved to be challenging. Tasks such as setting up 
+virtual machines (VMs), configuring SSH access, and managing network settings were not straightforward. The Google 
+Cloud Console interface was often laggy(could be due to our browsers) and difficult to navigate, which made 
+troubleshooting more time-consuming. 
+Compared to our prior experience with Microsoft Azure, the workflow in Google Cloud felt less intuitive and required 
+additional effort to understand the correct configurations.
+Another significant challenge was initializing Weights & Biases (Wandb) sweeps. We encountered repeated issues 
+related to authentication and credentials, which prevented the sweeps from running as expected. These problems 
+were difficult to diagnose, as error messages were not always clear. To overcome this, we had to carefully 
+reviewed the documentation watch videos.
+
+
+
 
 ### Question 31
 
@@ -760,4 +773,5 @@ TODO: drift detection
 > Answer:
 
 We both equally contributed to the project. \
-AI tools were used for grammar correction and coding.
+We used AI tools for grammar correction and coding. For coding, we used AI to assist with logging, 
+Weights & Biases (Wandb), frontend development, and occasionally for identifying and resolving errors.
