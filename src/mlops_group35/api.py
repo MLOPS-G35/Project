@@ -41,7 +41,6 @@ def root():
     return response
 
 
-
 @app.get("/drift")
 def drift(n: int = 200, psi_threshold: float = 0.2):
     # --- ADDED: update system metrics on request ---

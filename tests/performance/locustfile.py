@@ -1,4 +1,3 @@
-
 import random
 from locust import HttpUser, task, between
 
@@ -26,17 +25,9 @@ class APIUser(HttpUser):
 
     @task(1)
     def drift_check(self):
-        self.client.get(
-            "/drift",
-            params={"n": 200, "psi_threshold": 0.2},
-            name="/drift"
-        )
+        self.client.get("/drift", params={"n": 200, "psi_threshold": 0.2}, name="/drift")
 
     @task(3)
     def predict(self):
         n_clusters = random.choice([0, 1, 3, 5])
-        self.client.post(
-            f"/predict?n_clusters={n_clusters}",
-            json=self.payload,
-            name="/predict"
-        )
+        self.client.post(f"/predict?n_clusters={n_clusters}", json=self.payload, name="/predict")
