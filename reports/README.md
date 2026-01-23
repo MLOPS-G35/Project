@@ -111,8 +111,8 @@ will check the repositories and the code to verify your answers.
 
 * [ ] Write some documentation for your application (M32)
 * [ ] Publish the documentation to GitHub Pages (M32)
-* [ ] Revisit your initial project description. Did the project turn out as you wanted?
-* [ ] Create an architectural diagram over your MLOps pipeline
+* [x] Revisit your initial project description. Did the project turn out as you wanted?
+* [x] Create an architectural diagram over your MLOps pipeline
 * [x] Make sure all group members have an understanding about all parts of the project
 * [x] Uploaded all your code to GitHub
 
@@ -726,7 +726,9 @@ if it counts as an extra as it's mentioned in the tasks.
 
 Frontend URL: http://35.209.123.130:8501 
 
-TODO: drift detection
+We also implemented basic drift detection functionality, both as an offline analysis script and as a runtime endpoint
+exposed by the API. This allows us to verify whether the input data differs from the distribution of the training data.
+
 ### Question 29
 
 > **Include a figure that describes the overall architecture of your system and what services that you make use of.**
