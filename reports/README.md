@@ -148,7 +148,6 @@ will check the repositories and the code to verify your answers.
 >
 > Answer: We did not use any third-party frameworks/packages that were not cover in the course. 
 
---- question 3 fill here ---
 
 ## Coding environment
 
@@ -427,7 +426,7 @@ This information is essential for reproducibility, as it allows us to know the e
 > Answer:
 
 For our project, we developed several Docker images: one for the API, one for the frontend, and one for training.
-We used docker images for CI to the VM-whenever changes occur in branch main, we build new images and deploy them to vm 
+We used docker images for CI to the VM whenever changes occur in branch main, we build new images and deploy them to vm 
 automatically by using Github actions.
 
 To run the API Docker image:\
